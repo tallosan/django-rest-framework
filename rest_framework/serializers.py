@@ -247,15 +247,20 @@ class BaseSerializer(Field):
 
     @property
     def data(self):
-        if hasattr(self, 'initial_data') and not hasattr(self, '_validated_data'):
-            msg = (
-                'When a serializer is passed a `data` keyword argument you '
-                'must call `.is_valid()` before attempting to access the '
-                'serialized `.data` representation.\n'
-                'You should either call `.is_valid()` first, '
-                'or access `.initial_data` instead.'
-            )
-            raise AssertionError(msg)
+        if hasattr(self, 'initial_data'):
+            if not hasattr(self, '_validated_data'):
+                msg = (
+                    'When a serializer is passed a `data` keyword argument you '
+                    'must call `.is_valid()` before attempting to access the '
+                    'serialized `.data` representation.\n'
+                    'You should either call `.is_valid()` first, '
+                    'or access `.initial_data` instead.'
+                )
+                raise AssertionError(msg)
+            else:
+                if self._validated_data == []:
+                    msg = 'You cannot access `.data` on an invalid serializer.'
+                    raise ValidationError(msg)
 
         if not hasattr(self, '_data'):
             if self.instance is not None and not getattr(self, '_errors', None):

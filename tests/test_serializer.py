@@ -125,6 +125,12 @@ class TestSerializer:
         with pytest.raises(AssertionError):
             serializer.save()
 
+    def test_data_access_on_invalid_serializer_raises_error(self):
+        serializer = self.Serializer(data=[{}, {}, {}], many=True)
+        assert not serializer.is_valid()
+        with pytest.raises(serializers.ValidationError):
+            serializer.data
+
     def test_validate_none_data(self):
         data = None
         serializer = self.Serializer(data=data)
